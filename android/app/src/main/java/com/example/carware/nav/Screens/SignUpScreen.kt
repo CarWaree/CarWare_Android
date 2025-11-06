@@ -1,5 +1,6 @@
 package com.example.carware.nav.Screens
 
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
@@ -27,21 +29,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.carware.R
+import com.example.carware.models.LoginRequest
+import com.example.carware.models.RegisterRequest
+import com.example.carware.nav.HomeScreen
 import com.example.carware.nav.LoginScreen
+import com.example.carware.nav.VerficationCodeScreen
+import com.example.carware.network.RetrofitInstance
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignUpScreen(navController: NavController) {
@@ -53,14 +65,55 @@ fun SignUpScreen(navController: NavController) {
     var pass by remember { mutableStateOf("") }
     var num by remember { mutableStateOf("") }
 
+    var isPassVisible by remember { mutableStateOf(false) }
+
     var confPass by remember { mutableStateOf("") }
     var userNameError by remember { mutableStateOf(false) }
     var emailError by remember { mutableStateOf(false) }
     var passError by remember { mutableStateOf(false) }
     var numError by remember { mutableStateOf(false) }
+    var confPassError by remember { mutableStateOf(false) }
+    var agreed by remember { mutableStateOf(false) }
 
     val scrollState = rememberScrollState()
-    var agreed by remember { mutableStateOf(false) }
+
+    val textFieldColors = TextFieldDefaults.colors(
+
+        unfocusedTextColor = Color.DarkGray,
+        errorTextColor = Color(194, 0, 0, 255),
+
+        focusedContainerColor = Color.Transparent,
+        unfocusedContainerColor = Color.Transparent,
+        disabledContainerColor = Color.Transparent,
+        errorContainerColor = Color.Transparent,
+
+
+        cursorColor = Color(194, 0, 0, 255),
+        focusedIndicatorColor = Color(
+            118,
+            118,
+            118,
+            255
+        ),    // underline/border when focused
+        unfocusedIndicatorColor = Color(
+            118,
+            118,
+            118,
+            255
+        ),  // underline/border when not focused
+        errorIndicatorColor = Color(194, 0, 0, 255),
+        focusedTextColor = Color(0, 0, 0, 255)
+
+
+    )
+
+    val scope = rememberCoroutineScope()
+
+    val context = LocalContext.current
+
+
+
+
 
 
 
@@ -172,25 +225,7 @@ fun SignUpScreen(navController: NavController) {
                                 },
                                 singleLine = true,
                                 shape = RoundedCornerShape(8.dp),
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent,
-                                    focusedIndicatorColor = Color(
-                                        30,
-                                        30,
-                                        30,
-                                        168
-                                    ),   // green border when focused
-                                    unfocusedIndicatorColor = Color(
-                                        30,
-                                        30,
-                                        30,
-                                        168
-                                    ), // gray border when not focused
-                                    focusedTextColor = Color.Black,
-                                    unfocusedTextColor = Color.DarkGray,
-                                    cursorColor = Color.Black
-                                )
+                                colors = textFieldColors
                             ) //Fname field
                             Spacer(modifier = m.padding(horizontal = 12.dp))
                             OutlinedTextField(
@@ -207,25 +242,7 @@ fun SignUpScreen(navController: NavController) {
                                 },
                                 singleLine = true,
                                 shape = RoundedCornerShape(8.dp),
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent,
-                                    focusedIndicatorColor = Color(
-                                        30,
-                                        30,
-                                        30,
-                                        168
-                                    ),   // green border when focused
-                                    unfocusedIndicatorColor = Color(
-                                        30,
-                                        30,
-                                        30,
-                                        168
-                                    ), // gray border when not focused
-                                    focusedTextColor = Color.Black,
-                                    unfocusedTextColor = Color.DarkGray,
-                                    cursorColor = Color.Black
-                                )
+                                colors = textFieldColors
                             ) //Lname field
 
                         } // fname &lname
@@ -240,38 +257,24 @@ fun SignUpScreen(navController: NavController) {
                             },
                             placeholder = {
                                 Text(
-                                    "User Name",
+                                    text = if (userNameError) "Username is Required" else "Username",
                                     fontFamily = popMid,
                                     fontSize = 12.sp,
-                                    color = Color(30, 30, 30, 168)
-
+                                    color = if (userNameError) Color(194, 0, 0, 255) else Color(
+                                        30,
+                                        30,
+                                        30,
+                                        168
+                                    )
                                 )
                             },
                             isError = userNameError,
 
                             singleLine = true,
                             shape = RoundedCornerShape(8.dp),
-                            colors = TextFieldDefaults.colors(
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent,
-                                focusedIndicatorColor = Color(
-                                    30,
-                                    30,
-                                    30,
-                                    168
-                                ),   // green border when focused
-                                unfocusedIndicatorColor = Color(
-                                    30,
-                                    30,
-                                    30,
-                                    168
-                                ), // gray border when not focused
-                                focusedTextColor = Color.Black,
-                                unfocusedTextColor = Color.DarkGray,
-                                cursorColor = Color.Black
-                            ),
+                            colors = textFieldColors
 
-                            ) //user name field
+                        ) //user name field
                         Spacer(modifier = m.padding(vertical = 8.dp))
                         OutlinedTextField(
                             modifier = m.size(280.dp, 55.dp),
@@ -282,11 +285,15 @@ fun SignUpScreen(navController: NavController) {
                             },
                             placeholder = {
                                 Text(
-                                    "Email",
+                                    text = if (emailError) "Email is Required" else "Email",
                                     fontFamily = popMid,
                                     fontSize = 12.sp,
-                                    color = Color(30, 30, 30, 168)
-
+                                    color = if (emailError) Color(194, 0, 0, 255) else Color(
+                                        30,
+                                        30,
+                                        30,
+                                        168
+                                    )
                                 )
                             },
                             isError = emailError,
@@ -295,67 +302,39 @@ fun SignUpScreen(navController: NavController) {
                             ),
                             singleLine = true,
                             shape = RoundedCornerShape(8.dp),
-                            colors = TextFieldDefaults.colors(
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent,
-                                focusedIndicatorColor = Color(
-                                    30,
-                                    30,
-                                    30,
-                                    168
-                                ),   // green border when focused
-                                unfocusedIndicatorColor = Color(
-                                    30,
-                                    30,
-                                    30,
-                                    168
-                                ), // gray border when not focused
-                                focusedTextColor = Color.Black,
-                                unfocusedTextColor = Color.DarkGray,
-                                cursorColor = Color.Black,
-                            ),
+                            colors = textFieldColors
 
 
-                            ) //email field
+                        ) //email field
                         Spacer(modifier = m.padding(vertical = 8.dp))
                         OutlinedTextField(
 
                             modifier = m.size(280.dp, 55.dp),
                             value = num,
-                            onValueChange = { num = it },
+                            onValueChange = {
+                                num = it
+                                passError = false
+                            },
                             placeholder = {
                                 Text(
-                                    "Phone number",
+                                    text = if (numError) "phone number is Required" else "Phone number",
                                     fontFamily = popMid,
                                     fontSize = 12.sp,
-                                    color = Color(30, 30, 30, 168)
-
+                                    color = if (numError) Color(194, 0, 0, 255) else Color(
+                                        30,
+                                        30,
+                                        30,
+                                        168
+                                    )
                                 )
                             },
+                            isError = numError,
                             keyboardOptions = KeyboardOptions.Default.copy(
                                 keyboardType = KeyboardType.Phone
                             ),
                             singleLine = true,
                             shape = RoundedCornerShape(8.dp),
-                            colors = TextFieldDefaults.colors(
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent,
-                                focusedIndicatorColor = Color(
-                                    30,
-                                    30,
-                                    30,
-                                    168
-                                ),   // green border when focused
-                                unfocusedIndicatorColor = Color(
-                                    30,
-                                    30,
-                                    30,
-                                    168
-                                ), // gray border when not focused
-                                focusedTextColor = Color.Black,
-                                unfocusedTextColor = Color.DarkGray,
-                                cursorColor = Color.Black
-                            )
+                            colors = textFieldColors
 
 
                         )//number field
@@ -364,45 +343,44 @@ fun SignUpScreen(navController: NavController) {
 
                             modifier = m.size(280.dp, 55.dp),
                             value = pass,
-                            onValueChange = { pass = it },
+                            onValueChange = {
+                                pass = it
+                                passError = false
+                            },
                             placeholder = {
                                 Text(
-                                    "Password",
+                                    text = if (passError) "Password is Required" else "Password",
                                     fontFamily = popMid,
                                     fontSize = 12.sp,
-                                    color = Color(30, 30, 30, 168)
+                                    color = if (passError) Color(194, 0, 0, 255) else Color(
+                                        30,
+                                        30,
+                                        30,
+                                        168
+                                    )
 
                                 )
                             },
+                            isError = passError,
+                            visualTransformation = if (isPassVisible) VisualTransformation.None
+                            else PasswordVisualTransformation(),
                             keyboardOptions = KeyboardOptions.Default.copy(
                                 keyboardType = KeyboardType.Password
                             ),
                             singleLine = true,
-                            shape = RoundedCornerShape(8.dp), trailingIcon = ({
-                                Icon(
-                                    painter = painterResource(id = R.drawable.eye_off),
-                                    contentDescription = null,
-                                    tint = Color(118, 118, 118, 255)
-                                )
-                            }), colors = TextFieldDefaults.colors(
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent,
-                                focusedIndicatorColor = Color(
-                                    30,
-                                    30,
-                                    30,
-                                    168
-                                ),   // green border when focused
-                                unfocusedIndicatorColor = Color(
-                                    30,
-                                    30,
-                                    30,
-                                    168
-                                ), // gray border when not focused
-                                focusedTextColor = Color.Black,
-                                unfocusedTextColor = Color.DarkGray,
-                                cursorColor = Color.Black
-                            )
+                            shape = RoundedCornerShape(8.dp),
+                            trailingIcon = ({
+                                val icon =
+                                    if (isPassVisible) R.drawable.eyee else R.drawable.eye_off
+                                IconButton(onClick = { isPassVisible = !isPassVisible }) {
+                                    Icon(
+                                        painter = painterResource(id = icon),
+                                        contentDescription = null,
+                                        tint = Color(118, 118, 118, 255),
+                                        modifier = m.size(24.dp)
+                                    )
+                                }
+                            }), colors = textFieldColors
 
 
                         ) //password field
@@ -418,45 +396,44 @@ fun SignUpScreen(navController: NavController) {
 
                             modifier = m.size(280.dp, 55.dp),
                             value = confPass,
-                            onValueChange = { confPass = it },
+                            onValueChange = {
+                                confPass = it
+                                confPassError = false
+                            },
                             placeholder = {
                                 Text(
-                                    " Confirm Password",
+                                    text = if (confPassError) "Confirmation is Required" else " Confirm your Password",
                                     fontFamily = popMid,
                                     fontSize = 12.sp,
-                                    color = Color(30, 30, 30, 168)
+                                    color = if (passError) Color(194, 0, 0, 255) else Color(
+                                        30,
+                                        30,
+                                        30,
+                                        168
+                                    )
 
                                 )
                             },
+                            isError = confPassError,
+                            visualTransformation = if (isPassVisible) VisualTransformation.None
+                            else PasswordVisualTransformation(),
                             keyboardOptions = KeyboardOptions.Default.copy(
                                 keyboardType = KeyboardType.Password
                             ),
                             singleLine = true,
-                            shape = RoundedCornerShape(8.dp), trailingIcon = ({
-                                Icon(
-                                    painter = painterResource(id = R.drawable.eye_off),
-                                    contentDescription = null,
-                                    tint = Color(118, 118, 118, 255)
-                                )
-                            }), colors = TextFieldDefaults.colors(
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent,
-                                focusedIndicatorColor = Color(
-                                    30,
-                                    30,
-                                    30,
-                                    168
-                                ),   // green border when focused
-                                unfocusedIndicatorColor = Color(
-                                    30,
-                                    30,
-                                    30,
-                                    168
-                                ), // gray border when not focused
-                                focusedTextColor = Color.Black,
-                                unfocusedTextColor = Color.DarkGray,
-                                cursorColor = Color.Black
-                            )
+                            shape = RoundedCornerShape(8.dp),
+                            trailingIcon = ({
+                                val icon =
+                                    if (isPassVisible) R.drawable.eyee else R.drawable.eye_off
+                                IconButton(onClick = { isPassVisible = !isPassVisible }) {
+                                    Icon(
+                                        painter = painterResource(id = icon),
+                                        contentDescription = null,
+                                        tint = Color(118, 118, 118, 255),
+                                        modifier = m.size(24.dp)
+                                    )
+                                }
+                            }), colors = textFieldColors
 
 
                         ) //password match field
@@ -473,7 +450,7 @@ fun SignUpScreen(navController: NavController) {
                                 onClick = { agreed = !agreed },
                                 colors = RadioButtonDefaults.colors(
                                     selectedColor = Color(0xFFC20000),
-                                    unselectedColor = Color.Gray
+                                    unselectedColor = Color.Gray,
                                 )
                             )
                             Text(
@@ -486,9 +463,72 @@ fun SignUpScreen(navController: NavController) {
                         } //terms &conditions
 
                         Spacer(modifier = m.padding(vertical = 8.dp))
-
+                        //
                         Card(
-                            onClick = { /* handle click */ },
+
+                            onClick = {
+
+                                val emailEmpty = email.isBlank()
+                                val passwordEmpty = pass.isBlank()
+                                val userEmpty = userName.isBlank()
+                                val confPassEmpty = confPass.isEmpty()
+                                val numEmpty = num.isBlank()
+
+                                userNameError = userEmpty
+                                confPassError = confPassEmpty
+                                numError = numEmpty
+                                emailError = emailEmpty
+                                passError = passwordEmpty
+                                if (!email.isBlank() &&
+                                    !pass.isBlank() &&
+                                    !userName.isBlank() &&
+                                    !num.isBlank() &&
+                                    !confPass.isBlank() &&
+                                    agreed != false &&
+                                    (pass == confPass)
+
+                                ) {
+
+
+                                    scope.launch {  //  run inside coroutine
+                                        val request = RegisterRequest(
+                                            agreed,
+                                            confPass,
+                                            email, fName,
+                                            lName,
+                                            pass,
+                                            num,
+                                            userName,
+                                        )
+                                        try {
+                                            val response = RetrofitInstance.api.register(request)
+                                            if (response.isSuccessful) {
+                                                Toast.makeText(
+                                                    context,
+                                                    "Register successful! ,please verify your mail",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                                navController.navigate(HomeScreen)
+                                            } else {
+                                                Toast.makeText(
+                                                    context,
+                                                    "register failed: ${response.code()}",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                        } catch (e: Exception) {
+                                            Toast.makeText(
+                                                context,
+                                                "Error: ${e.message}",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    }
+
+                                }
+
+
+                            },
                             modifier = m
                                 .size(width = 280.dp, height = 50.dp)
                                 .border(
@@ -584,7 +624,6 @@ fun SignUpScreen(navController: NavController) {
 
 
 }
-
 
 
 @Composable

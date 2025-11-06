@@ -36,12 +36,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.carware.R
+import com.example.carware.nav.HomeScreen
 import com.example.carware.nav.LoginScreen
 import com.example.carware.nav.NewPasswordScreen
 
 @Composable
 fun VerficationCodeScreen(navController: NavController) {
 
+
+    val previousEntry = navController.previousBackStackEntry
+    val previousRoute = previousEntry?.destination?.route
+
+    val cameFromSignup = previousRoute?.contains("SignUpScreen") == true
+    val cameFromReset = previousRoute?.contains("ResetPasswordScreen") == true
 
     var OTP by remember { mutableStateOf("") }
 
@@ -178,7 +185,13 @@ fun VerficationCodeScreen(navController: NavController) {
                     Spacer(modifier = m.padding(vertical = 8.dp))
 
                     Card(
-                        onClick = { navController.navigate(NewPasswordScreen) },
+                        onClick = {
+                            when {
+                                cameFromSignup -> navController.navigate(HomeScreen)
+                                cameFromReset -> navController.navigate(NewPasswordScreen)
+                                else -> navController.popBackStack() // fallback
+                            }
+                        },
                         modifier = m
 
                             .size(width = 280.dp, height = 45.dp)
