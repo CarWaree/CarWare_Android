@@ -1,4 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -6,7 +5,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    kotlin("plugin.serialization") version "2.2.21"
+    alias(libs.plugins.kotlin.serialization)
+
 
 }
 
@@ -31,6 +31,8 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.ktor.client.okhttp)
+            implementation(libs.core.splashscreen)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -43,8 +45,15 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation("org.jetbrains.androidx.navigation:navigation-compose:2.9.1")
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+            implementation(libs.bundles.ktor)
+            implementation("com.russhwolf:multiplatform-settings-no-arg:1.1.1")
 
         }
+
+        nativeMain.dependencies {
+            libs.ktor.client.darwin
+        }//ios
+
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
@@ -52,7 +61,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.example.careware"
+    namespace = "com.example.carware"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {

@@ -1,4 +1,4 @@
-package com.example.carware.Screens
+package com.example.carware.screens.auth
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -9,12 +9,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -41,26 +39,36 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import careware.composeapp.generated.resources.Res
-import careware.composeapp.generated.resources.carware
-import careware.composeapp.generated.resources.eye_off
-import careware.composeapp.generated.resources.eyee
-import careware.composeapp.generated.resources.google_icon_logo_svgrepo_com
-import careware.composeapp.generated.resources.line_1
-import careware.composeapp.generated.resources.poppins_medium
-import careware.composeapp.generated.resources.poppins_semibold
+import carware.composeapp.generated.resources.Res
+import carware.composeapp.generated.resources.carware
+import carware.composeapp.generated.resources.eye_off
+import carware.composeapp.generated.resources.eyee
+import carware.composeapp.generated.resources.google_icon_logo_svgrepo_com
+import carware.composeapp.generated.resources.line_1
+import carware.composeapp.generated.resources.poppins_medium
+import carware.composeapp.generated.resources.poppins_semibold
 import com.example.carware.m
 import com.example.carware.navigation.HomeScreen
 import com.example.carware.navigation.ResetPasswordScreen
 import com.example.carware.navigation.SignUpScreen
+import com.example.carware.network.apiRequests.LoginRequest
+import com.example.carware.network.apiRequests.SignUpRequest
+import com.example.carware.network.loginUser
+import com.example.carware.network.signupUser
+import com.example.carware.screens.appButtonBack
+import com.example.carware.screens.appGradBack
+import com.example.carware.util.LoginManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(navController: NavController,loginManager: LoginManager) {
 
 
     val popSemi = FontFamily(
@@ -76,6 +84,7 @@ fun LoginScreen(navController: NavController) {
     var isErrorEmail by remember { mutableStateOf(false) }
     var isErrorPass by remember { mutableStateOf(false) }
 
+    var token by remember { mutableStateOf("") }
 
     val scope = rememberCoroutineScope()
 
@@ -290,6 +299,47 @@ fun LoginScreen(navController: NavController) {
                         onClick = {
                             isErrorEmail = email.isBlank()
                             isErrorPass = pass.isBlank()
+                            if (!isErrorEmail && !isErrorPass){try {
+                                // 3️⃣ Create signup request
+                                val request = LoginRequest(
+                                    password = pass,
+                                    emailOrUsername = email,
+
+                                )
+
+                                // 4️⃣ Launch coroutine to call API
+                                CoroutineScope(Dispatchers.Default).launch {
+                                    try {
+                                        val response =
+                                            loginUser(request) // common function
+
+                                        withContext(Dispatchers.Main) {
+                                            // ✅ Handle success
+                                            // You can navigate to next screen or show a Toast/Snackbar
+                                            val token = response.data?.token
+                                                ?: throw IllegalStateException("Token missing in response")
+
+                                            loginManager.performLogin(token)
+                                            navController.navigate(HomeScreen){
+                                                popUpTo(SignUpScreen) { inclusive = true }
+                                            }
+                                        }
+
+
+
+                                    } catch (e: Exception) {
+                                        withContext(Dispatchers.Main) {
+                                            // ❌ Handle error
+                                            println("Login failed: ${e.message}")
+                                        }
+                                    }
+                                }
+
+                            } catch (e: Exception) {
+                                // This should rarely happen unless request creation fails
+                                println("Request creation failed: ${e.message}")
+                            }
+                            }
                         },
                         modifier = m
 

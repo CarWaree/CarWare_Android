@@ -1,4 +1,4 @@
-package com.example.careware
+package com.example.carware
 
 import platform.UIKit.UIDevice
 

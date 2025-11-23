@@ -1,4 +1,4 @@
-package com.example.carware.Screens
+package com.example.carware.screens.auth
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -30,31 +29,65 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import careware.composeapp.generated.resources.Res
-import careware.composeapp.generated.resources.carware
-import careware.composeapp.generated.resources.line_1
-import careware.composeapp.generated.resources.poppins_medium
-import careware.composeapp.generated.resources.poppins_semibold
+import carware.composeapp.generated.resources.Res
+import carware.composeapp.generated.resources.carware
+import carware.composeapp.generated.resources.line_1
+import carware.composeapp.generated.resources.poppins_medium
+import carware.composeapp.generated.resources.poppins_semibold
 import com.example.carware.m
 import com.example.carware.navigation.LoginScreen
+import com.example.carware.network.apiRequests.ResetPasswordRequest
+import com.example.carware.screens.appButtonBack
+import com.example.carware.screens.appGradBack
+import com.example.carware.util.SharedToken
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun NewPasswordScreen(navController: NavController) {
     val popSemi = FontFamily(
-        Font(Res.font.poppins_semibold ) // name of your font file without extension
+        Font(Res.font.poppins_semibold) // name of your font file without extension
     )
 
     val popMid = FontFamily(Font(Res.font.poppins_medium))
 
     var pass by remember { mutableStateOf("") }
-    var pass2 by remember { mutableStateOf("") }
+    var confPass by remember { mutableStateOf("") }
+    var passError by remember { mutableStateOf(false) }
+    var confPassError by remember { mutableStateOf(false) }
+    val textFieldColors = TextFieldDefaults.colors(
 
+        unfocusedTextColor = Color.DarkGray,
+        errorTextColor = Color(194, 0, 0, 255),
+
+        focusedContainerColor = Color.Transparent,
+        unfocusedContainerColor = Color.Transparent,
+        disabledContainerColor = Color.Transparent,
+        errorContainerColor = Color.Transparent,
+
+
+        cursorColor = Color(194, 0, 0, 255),
+        focusedIndicatorColor = Color(
+            118,
+            118,
+            118,
+            255
+        ),    // underline/border when focused
+        unfocusedIndicatorColor = Color(
+            118,
+            118,
+            118,
+            255
+        ),  // underline/border when not focused
+        errorIndicatorColor = Color(194, 0, 0, 255),
+        focusedTextColor = Color(0, 0, 0, 255)
+
+
+    )
+    val token = SharedToken.token          // read
 
     Column(
         modifier = m
@@ -124,104 +157,100 @@ fun NewPasswordScreen(navController: NavController) {
 
                     Spacer(modifier = m.padding(top = 18.dp))
                     OutlinedTextField(
+
                         modifier = m.size(280.dp, 55.dp),
                         value = pass,
                         onValueChange = {
                             pass = it
+                            passError = false
                         },
                         placeholder = {
                             Text(
-                                "New Password",
+                                text = if (passError) "Password is Required" else "Password",
                                 fontFamily = popMid,
                                 fontSize = 12.sp,
-                                color = Color(30, 30, 30, 168)
+                                color = if (passError) Color(194, 0, 0, 255) else Color(
+                                    30,
+                                    30,
+                                    30,
+                                    168
+                                )
 
                             )
                         },
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Password
-                        ),
+                        isError = passError,
+
                         singleLine = true,
                         shape = RoundedCornerShape(8.dp),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color(
-                                30,
-                                30,
-                                30,
-                                168
-                            ),   // green border when focused
-                            unfocusedIndicatorColor = Color(
-                                30,
-                                30,
-                                30,
-                                168
-                            ), // gray border when not focused
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.DarkGray,
-                            cursorColor = Color.Black
-                        ),
+                        colors = textFieldColors
 
-                        ) //new pass field
-                    Row (m.fillMaxWidth()
-                        .padding(start = 32.dp)
-                        , horizontalArrangement = Arrangement.Start
-                    ){  Text(
-                        "minimum 8 characters,letters and numbers",
-                        fontFamily = popSemi,
-                        fontSize = 8.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(30, 30, 30, 168)
 
-                    )
+                    ) //password field
+                    Row(
+                        m.fillMaxWidth()
+                            .padding(start = 32.dp), horizontalArrangement = Arrangement.Start
+                    ) {
+                        Text(
+                            "minimum 8 characters,letters and numbers",
+                            fontFamily = popSemi,
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(30, 30, 30, 168)
+
+                        )
 
                     } // minimum text
                     Spacer(modifier = m.padding(top = 8.dp))
                     OutlinedTextField(
+
                         modifier = m.size(280.dp, 55.dp),
-                        value = pass2,
+                        value = confPass,
                         onValueChange = {
-                            pass2 = it
+                            confPass = it
+                            confPassError = false
                         },
                         placeholder = {
                             Text(
-                                "Confirm Password",
+                                text = if (confPassError) "Confirmation is Required" else " Confirm your Password",
                                 fontFamily = popMid,
                                 fontSize = 12.sp,
-                                color = Color(30, 30, 30, 168)
+                                color = if (passError) Color(194, 0, 0, 255) else Color(
+                                    30,
+                                    30,
+                                    30,
+                                    168
+                                )
 
                             )
                         },
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Password
-                        ),
+                        isError = confPassError,
+
                         singleLine = true,
                         shape = RoundedCornerShape(8.dp),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color(
-                                30,
-                                30,
-                                30,
-                                168
-                            ),   // green border when focused
-                            unfocusedIndicatorColor = Color(
-                                30,
-                                30,
-                                30,
-                                168
-                            ), // gray border when not focused
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.DarkGray,
-                            cursorColor = Color.Black
-                        ),
+                        colors = textFieldColors
 
-                        ) //conf pass field
+
+                    ) //password match field
                     Spacer(modifier = m.padding(top = 12.dp))
                     Card(
-                        onClick = { /* handle click */ },
+                        onClick = {
+                            val passwordEmpty = pass.isBlank()
+                            val confPassEmpty = confPass.isBlank()
+                            val passMismatch = pass != confPass
+
+                            passError = passwordEmpty
+                            confPassError = confPassEmpty || passMismatch
+                            if (!passwordEmpty &&!confPassEmpty){
+                                val request= ResetPasswordRequest(
+                                    newPassword = pass,
+                                    confirmPassword = confPass,
+                                    token = token
+
+                                )
+                            }
+
+
+                        },
                         modifier = m
 
                             .size(width = 280.dp, height = 50.dp)
@@ -261,11 +290,9 @@ fun NewPasswordScreen(navController: NavController) {
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(194, 0, 0, 255),
-                            modifier = m.clickable {navController.navigate(LoginScreen) }
+                            modifier = m.clickable { navController.navigate(LoginScreen) }
                         )
                     } //back to login textbutton
-
-
 
 
                 }

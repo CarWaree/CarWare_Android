@@ -20,12 +20,14 @@ object NewPasswordScreen
 @Serializable
 object VerificationCodeScreen
 
-// Optional: Sealed class wrapper without serialization
-sealed class AppRoute {
-    object SignUp : AppRoute()
-    object Login : AppRoute()
-    object Home : AppRoute()
-    object ResetPassword : AppRoute()
-    object VerificationCode : AppRoute()
-    object NewPassword: AppRoute()
-}
+@Serializable
+object OnboardingScreen
+//// Optional: Sealed class wrapper without serialization
+//sealed class AppRoute {
+//    object SignUp : AppRoute()
+//    object Login : AppRoute()
+//    object Home : AppRoute()
+//    object ResetPassword : AppRoute()
+//    object VerificationCode : AppRoute()
+//    object NewPassword: AppRoute()
+//}

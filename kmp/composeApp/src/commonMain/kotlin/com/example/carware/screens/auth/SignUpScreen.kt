@@ -1,4 +1,4 @@
-package com.example.carware.screens
+package com.example.carware.screens.auth
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,13 +28,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -43,24 +41,35 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import careware.composeapp.generated.resources.Res
-import careware.composeapp.generated.resources.carware
-import careware.composeapp.generated.resources.eye_off
-import careware.composeapp.generated.resources.eyee
-import careware.composeapp.generated.resources.google_icon_logo_svgrepo_com
-import careware.composeapp.generated.resources.line_1
-import careware.composeapp.generated.resources.poppins_medium
-import careware.composeapp.generated.resources.poppins_semibold
-import com.example.carware.Screens.appButtonBack
-import com.example.carware.Screens.appGradBack
+import carware.composeapp.generated.resources.Res
+import carware.composeapp.generated.resources.carware
+import carware.composeapp.generated.resources.eye_off
+import carware.composeapp.generated.resources.eyee
+import carware.composeapp.generated.resources.google_icon_logo_svgrepo_com
+import carware.composeapp.generated.resources.line_1
+import carware.composeapp.generated.resources.poppins_medium
+import carware.composeapp.generated.resources.poppins_semibold
 import com.example.carware.m
+import com.example.carware.navigation.HomeScreen
 import com.example.carware.navigation.LoginScreen
+import com.example.carware.navigation.SignUpScreen
+import com.example.carware.network.apiRequests.SignUpRequest
+import com.example.carware.network.createHttpClient
+import com.example.carware.network.signupUser
+import com.example.carware.screens.appButtonBack
+import com.example.carware.screens.appGradBack
+import com.example.carware.util.LoginManager
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.logging.LoggingFormat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun SignUpScreen(navController: NavController) {
+fun SignUpScreen(navController: NavController,loginManager: LoginManager ) {
 
     val popSemi = FontFamily(
         Font(Res.font.poppins_semibold) // name of your font file without extension
@@ -74,6 +83,7 @@ fun SignUpScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
     var num by remember { mutableStateOf("") }
+    var token by remember { mutableStateOf("") }
 
     var isPassVisible by remember { mutableStateOf(false) }
 
@@ -116,7 +126,6 @@ fun SignUpScreen(navController: NavController) {
 
 
     )
-
 
 
 
@@ -375,7 +384,7 @@ fun SignUpScreen(navController: NavController) {
                                     if (isPassVisible) Res.drawable.eyee else Res.drawable.eye_off
                                 IconButton(onClick = { isPassVisible = !isPassVisible }) {
                                     Icon(
-                                        painter = painterResource( icon),
+                                        painter = painterResource(icon),
                                         contentDescription = null,
                                         tint = Color(118, 118, 118, 255),
                                         modifier = m.size(24.dp)
@@ -468,29 +477,67 @@ fun SignUpScreen(navController: NavController) {
                         Card(
 
                             onClick = {
-
+                                // 1️⃣ Validate fields
                                 val emailEmpty = email.isBlank()
                                 val passwordEmpty = pass.isBlank()
                                 val userEmpty = userName.isBlank()
-                                val confPassEmpty = confPass.isEmpty()
+                                val confPassEmpty = confPass.isBlank()
                                 val numEmpty = num.isBlank()
+                                val passMismatch = pass != confPass
+                                val agreedEmpty = !agreed
 
-                                userNameError = userEmpty
-                                confPassError = confPassEmpty
-                                numError = numEmpty
+                                // 2️⃣ Show errors
                                 emailError = emailEmpty
                                 passError = passwordEmpty
-                                if (!email.isBlank() &&
-                                    !pass.isBlank() &&
-                                    !userName.isBlank() &&
-                                    !num.isBlank() &&
-                                    !confPass.isBlank() &&
-                                    agreed != false &&
-                                    (pass == confPass)
+                                userNameError = userEmpty
+                                confPassError = confPassEmpty || passMismatch
+                                numError = numEmpty
 
-                                ) {}
+                                if (!emailEmpty && !passwordEmpty && !userEmpty && !confPassEmpty && !numEmpty && !passMismatch && agreed) {
+                                    try {
+                                        // 3️⃣ Create signup request
+                                        val request = SignUpRequest(
+                                            firstName = fName,
+                                            lastName = lName,
+                                            userName = userName,
+                                            email = email,
+                                            password = pass,
+                                            confirmPassword = confPass
+                                        )
+
+                                        // 4️⃣ Launch coroutine to call API
+                                        CoroutineScope(Dispatchers.Default).launch {
+                                            try {
+                                                val response =
+                                                    signupUser(request)
+
+                                                withContext(Dispatchers.Main) {
+                                                    // ✅ Handle success
+                                                    val token = response.data?.token
+                                                        ?: throw IllegalStateException("Token missing in response")
+
+                                                    loginManager.performLogin(token)
+
+                                                    navController.navigate(HomeScreen){
+                                                        popUpTo(SignUpScreen) { inclusive = true }
+                                                    }
+                                                }
 
 
+
+                                            } catch (e: Exception) {
+                                                withContext(Dispatchers.Main) {
+                                                    // ❌ Handle error
+                                                    println("Signup failed: ${e.message}")
+                                                }
+                                            }
+                                        }
+
+                                    } catch (e: Exception) {
+                                        // This should rarely happen unless request creation fails
+                                        println("Request creation failed: ${e.message}")
+                                    }
+                                }
                             },
                             modifier = m
                                 .size(width = 280.dp, height = 50.dp)
