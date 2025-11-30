@@ -1,4 +1,4 @@
-rootProject.name = "CareWare"
+rootProject.name = "CarWare"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
