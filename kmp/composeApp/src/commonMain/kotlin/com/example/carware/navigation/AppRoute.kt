@@ -22,6 +22,17 @@ object VerificationCodeScreen
 
 @Serializable
 object OnboardingScreen
+
+@Serializable
+object SettingsScreen
+
+@Serializable
+object HistoryScreen
+
+@Serializable
+object ScheduleScreen
+
+
 //// Optional: Sealed class wrapper without serialization
 //sealed class AppRoute {
 //    object SignUp : AppRoute()

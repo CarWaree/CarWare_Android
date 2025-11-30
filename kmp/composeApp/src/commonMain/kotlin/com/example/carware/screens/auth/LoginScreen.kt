@@ -49,6 +49,7 @@ import carware.composeapp.generated.resources.poppins_medium
 import carware.composeapp.generated.resources.poppins_semibold
 import com.example.carware.m
 import com.example.carware.navigation.HomeScreen
+import com.example.carware.navigation.LoginScreen
 import com.example.carware.navigation.ResetPasswordScreen
 import com.example.carware.navigation.SignUpScreen
 import com.example.carware.network.apiRequests.LoginRequest
@@ -60,6 +61,7 @@ import com.example.carware.screens.appGradBack
 import com.example.carware.util.LoginManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -319,9 +321,12 @@ fun LoginScreen(navController: NavController,loginManager: LoginManager) {
                                             val token = response.data?.token
                                                 ?: throw IllegalStateException("Token missing in response")
 
-                                            loginManager.performLogin(token)
+                                            withContext(Dispatchers.IO) {
+                                                loginManager.performLogin(token)
+                                            }
+
                                             navController.navigate(HomeScreen){
-                                                popUpTo(SignUpScreen) { inclusive = true }
+                                                popUpTo(LoginScreen) { inclusive = true }
                                             }
                                         }
 

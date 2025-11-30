@@ -14,7 +14,7 @@ class LoginManager(private val session: UserSession) {
         session.logout()
     }
 
-    suspend fun shouldAutoLogin(): Boolean {
+     fun shouldAutoLogin(): Boolean {
         return session.isLoggedIn() // shared check logic
     }
     fun isOnboardingComplete() = settings.getBoolean(KEY_ONBOARDING, false)

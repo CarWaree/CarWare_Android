@@ -15,7 +15,7 @@ class AndroidUserSession(private val context: Context) : UserSession {
         prefs.edit().clear().apply()
     }
 
-    override suspend fun isLoggedIn(): Boolean {
+    override  fun isLoggedIn(): Boolean {
         return prefs.getBoolean("is_logged_in", false)
     }
 

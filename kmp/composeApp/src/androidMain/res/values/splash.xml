@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Your main application theme -->
-    <style name="Theme.App" parent="android:Theme.Material.NoActionBar">
-        <!-- Main theme attributes -->
+    <!-- Main App Theme -->
+    <style name="Theme.CarWare" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <!-- REMOVE windowBackground or set to a color -->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
     <!-- Splash Screen Theme -->
@@ -10,8 +13,6 @@
         <item name="windowSplashScreenBackground">#B30000</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/logo</item>
         <item name="windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
-        <item name="postSplashScreenTheme">@style/Theme.App</item>
+        <item name="postSplashScreenTheme">@style/Theme.CarWare</item>
     </style>
-
-    <style name="Theme.CarWare" parent="android:Theme.Material.Light.DarkActionBar" />
 </resources>

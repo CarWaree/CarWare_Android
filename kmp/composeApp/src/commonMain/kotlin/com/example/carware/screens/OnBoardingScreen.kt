@@ -295,7 +295,6 @@ fun OnBoardingScreen(
 @Composable
 fun IndicateIcon(isSelected: Boolean) {
 
-
     val shape = RoundedCornerShape(50)
 
     Box(

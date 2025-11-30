@@ -15,10 +15,10 @@ import io.ktor.client.request.setBody
 import io.ktor.http.*
 import io.ktor.http.contentType
 
-
+val baseUrl="https://mq7230r4-7136.uks1.devtunnels.ms"
 suspend fun signupUser(request: SignUpRequest): AuthResponse {
     val client = createHttpClient()
-    return client.post("https://vxgf83b6-7136.uks1.devtunnels.ms/api/Auth/register") {
+    return client.post("$baseUrl/api/Auth/register") {
         contentType(ContentType.Application.Json)
         setBody(request)
     }.body()
@@ -26,7 +26,7 @@ suspend fun signupUser(request: SignUpRequest): AuthResponse {
 suspend fun loginUser(request: LoginRequest):  AuthResponse{
     val client = createHttpClient()
 
-    return client.post("https://vxgf83b6-7136.uks1.devtunnels.ms/api/Auth/login") {
+    return client.post("$baseUrl/api/Auth/login") {
         contentType(ContentType.Application.Json)
         setBody(request)
     }.body()
@@ -34,21 +34,21 @@ suspend fun loginUser(request: LoginRequest):  AuthResponse{
 }
 suspend fun forgotPasswordUser(request: ForgotPasswordRequest): ForgotPasswordResponse{
     val client=createHttpClient()
-    return client.post("https://vxgf83b6-7136.uks1.devtunnels.ms/api/Auth/forgot-password") {
+    return client.post("$baseUrl/api/Auth/forgot-password") {
         contentType(ContentType.Application.Json)
         setBody(request)
     }.body()
 }
 suspend fun otpVerificationUser(request: OTPRequest): OTPResponse{
     val client=createHttpClient()
-    return client.post("https://vxgf83b6-7136.uks1.devtunnels.ms/api/Auth/Verify-Otp") {
+    return client.post("$baseUrl/api/Auth/Verify-Otp") {
         contentType(ContentType.Application.Json)
         setBody(request)
     }.body()
 }
 suspend fun resetPasswordUser(request: ResetPasswordRequest): ResetPasswordResponse{
     val client=createHttpClient()
-    return client.post("https://vxgf83b6-7136.uks1.devtunnels.ms/api/Auth/reset-password") {
+    return client.post("$baseUrl/api/Auth/reset-password") {
         contentType(ContentType.Application.Json)
         setBody(request)
     }.body()

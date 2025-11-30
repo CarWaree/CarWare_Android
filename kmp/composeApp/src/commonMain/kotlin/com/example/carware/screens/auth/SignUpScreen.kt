@@ -63,6 +63,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.logging.LoggingFormat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.Font
@@ -516,7 +517,9 @@ fun SignUpScreen(navController: NavController,loginManager: LoginManager ) {
                                                     val token = response.data?.token
                                                         ?: throw IllegalStateException("Token missing in response")
 
-                                                    loginManager.performLogin(token)
+                                                    withContext(Dispatchers.IO) {
+                                                        loginManager.performLogin(token)
+                                                    }
 
                                                     navController.navigate(HomeScreen){
                                                         popUpTo(SignUpScreen) { inclusive = true }
