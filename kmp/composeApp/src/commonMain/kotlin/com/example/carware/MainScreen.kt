@@ -25,6 +25,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.carware.navigation.AddCarScreen
 import com.example.carware.navigation.HistoryScreen
 import com.example.carware.navigation.HomeScreen
 import com.example.carware.navigation.LoginScreen
@@ -35,6 +36,7 @@ import com.example.carware.navigation.ScheduleScreen
 import com.example.carware.navigation.SettingsScreen
 import com.example.carware.navigation.SignUpScreen
 import com.example.carware.navigation.VerificationCodeScreen
+import com.example.carware.screens.AddCarScreen
 import com.example.carware.screens.BottomNavBar
 import com.example.carware.screens.OnBoardingScreen
 import com.example.carware.screens.appGradBack
@@ -49,6 +51,7 @@ import com.example.carware.screens.mainScreens.ScheduleScreen
 import com.example.carware.screens.mainScreens.SettingsScreen
 import com.example.carware.util.navBar.bottomTabs
 import com.example.carware.util.LoginManager
+import com.example.carware.util.car.AddCarViewModel
 
 val m = Modifier
 
@@ -65,7 +68,7 @@ fun MainScreen(loginManager: LoginManager) {
     val startDestination = when {
         !loginManager.isOnboardingComplete() -> OnboardingScreen
         loginManager.shouldAutoLogin() -> HomeScreen
-        else -> SignUpScreen   // or LoginScreen
+        else -> AddCarScreen   //  should be 'signup'
     }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
@@ -73,7 +76,7 @@ fun MainScreen(loginManager: LoginManager) {
 
     NavHost(
         navController = navController,
-        startDestination = startDestination,
+        startDestination = AddCarScreen,
     )
     {
         composable<HomeScreen> {
@@ -132,6 +135,11 @@ fun MainScreen(loginManager: LoginManager) {
         composable<HistoryScreen> {
             HistoryScreen(navController)
         }
+        composable<AddCarScreen> {
+            AddCarScreen(navController,
+                viewModel = AddCarViewModel())
+        }
+
 
 
     }
