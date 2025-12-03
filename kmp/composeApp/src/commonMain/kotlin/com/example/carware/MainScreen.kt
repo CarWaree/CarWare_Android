@@ -36,6 +36,7 @@ import com.example.carware.navigation.ScheduleScreen
 import com.example.carware.navigation.SettingsScreen
 import com.example.carware.navigation.SignUpScreen
 import com.example.carware.navigation.VerificationCodeScreen
+import com.example.carware.repository.VehicleRepository
 import com.example.carware.screens.AddCarScreen
 import com.example.carware.screens.BottomNavBar
 import com.example.carware.screens.OnBoardingScreen
@@ -51,7 +52,7 @@ import com.example.carware.screens.mainScreens.ScheduleScreen
 import com.example.carware.screens.mainScreens.SettingsScreen
 import com.example.carware.util.navBar.bottomTabs
 import com.example.carware.util.LoginManager
-import com.example.carware.util.car.AddCarViewModel
+import com.example.carware.viewModel.AddCarViewModel
 
 val m = Modifier
 
@@ -67,16 +68,18 @@ fun MainScreen(loginManager: LoginManager) {
 
     val startDestination = when {
         !loginManager.isOnboardingComplete() -> OnboardingScreen
-        loginManager.shouldAutoLogin() -> HomeScreen
-        else -> AddCarScreen   //  should be 'signup'
+        !loginManager.shouldAutoLogin() -> SignUpScreen
+        !loginManager.hasAddedCar()->AddCarScreen
+        else -> HomeScreen  //  should be 'signup'
     }
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+val vehicleRepository= VehicleRepository()
 
 
 
     NavHost(
         navController = navController,
-        startDestination = AddCarScreen,
+        startDestination = startDestination,
     )
     {
         composable<HomeScreen> {
@@ -137,7 +140,8 @@ fun MainScreen(loginManager: LoginManager) {
         }
         composable<AddCarScreen> {
             AddCarScreen(navController,
-                viewModel = AddCarViewModel())
+                viewModel = AddCarViewModel( vehicleRepository,loginManager)
+            )
         }
 
 

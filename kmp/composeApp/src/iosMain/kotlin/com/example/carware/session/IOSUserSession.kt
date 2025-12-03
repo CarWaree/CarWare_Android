@@ -6,7 +6,7 @@ import platform.Foundation.NSUserDefaults
 class IOSUserSession : UserSession {
     private val defaults = NSUserDefaults.standardUserDefaults()
 
-    override suspend fun login(token: String) {
+    override suspend fun login(token: String?) {
         defaults.setBool(true, "is_logged_in")
         defaults.setObject(token, "token")
     }

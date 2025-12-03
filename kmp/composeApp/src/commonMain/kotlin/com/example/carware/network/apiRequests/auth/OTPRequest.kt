@@ -1,4 +1,4 @@
-package com.example.carware.network.apiRequests
+package com.example.carware.network.apiRequests.auth
 
 import kotlinx.serialization.Serializable
 

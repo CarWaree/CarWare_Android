@@ -43,12 +43,8 @@ import com.example.carware.m
 import com.example.carware.navigation.HomeScreen
 import com.example.carware.navigation.LoginScreen
 import com.example.carware.navigation.NewPasswordScreen
-import com.example.carware.navigation.VerificationCodeScreen
-import com.example.carware.network.apiRequests.ForgotPasswordRequest
-import com.example.carware.network.apiRequests.OTPRequest
-import com.example.carware.network.apiResponse.OTPResponse
-import com.example.carware.network.forgotPasswordUser
-import com.example.carware.network.otpVerificationUser
+import com.example.carware.network.apiRequests.auth.OTPRequest
+import com.example.carware.network.Api.otpVerificationUser
 import com.example.carware.screens.appButtonBack
 import com.example.carware.screens.appGradBack
 import com.example.carware.util.SharedToken
@@ -250,13 +246,9 @@ fun VerificationCodeScreen(navController: NavController) {
                                                 otpVerificationUser(request)
 
                                             withContext(Dispatchers.Main) {
-                                                SharedToken.token = response.token  // save
+                                                SharedToken.token = response.data.token // save
 
-                                                when {
-                                                cameFromSignup ->
-                                                    navController.navigate(HomeScreen)
-                                                    cameFromReset -> navController.navigate(NewPasswordScreen)
-                                                    else -> navController.popBackStack() }
+                                                    navController.navigate(NewPasswordScreen)
                                             }
 
 
