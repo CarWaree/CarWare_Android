@@ -61,7 +61,7 @@ import com.example.carware.screens.cardGradBack
 
 
 @Composable
-fun HomeScreen(/*navController: NavController*/) {
+fun HomeScreen(navController: NavController) {
     val popSemi = FontFamily(Font(Res.font.poppins_semibold))
     val popMid = FontFamily(Font(Res.font.poppins_medium))
     val scrollState = rememberScrollState()
@@ -547,9 +547,9 @@ fun HomeScreen(/*navController: NavController*/) {
 //}
 
 
-
-@Preview
-@Composable
-fun prev() {
-    HomeScreen()
-}
+//
+//@Preview
+//@Composable
+//fun prev() {
+//    HomeScreen()
+//}
