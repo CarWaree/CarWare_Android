@@ -58,10 +58,14 @@ import carware.composeapp.generated.resources.arrow_1
 import com.example.carware.screens.appButtonBack
 import com.example.carware.screens.appGradBack
 import com.example.carware.screens.cardGradBack
+import carware.composeapp.generated.resources.notification
+import com.example.carware.screens.CarCard
+import io.ktor.http.ContentType
+import org.jetbrains.compose.resources.DrawableResource
 
 
 @Composable
-fun HomeScreen(/*navController: NavController*/) {
+fun HomeScreen(navController: NavController) {
     val popSemi = FontFamily(Font(Res.font.poppins_semibold))
     val popMid = FontFamily(Font(Res.font.poppins_medium))
     val scrollState = rememberScrollState()
@@ -74,7 +78,7 @@ fun HomeScreen(/*navController: NavController*/) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 35.dp, vertical = 32.dp),
+                .padding(horizontal = 32.dp, vertical = 50.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -97,7 +101,7 @@ fun HomeScreen(/*navController: NavController*/) {
             Spacer(modifier = m.padding(horizontal = 8.dp))
 
             Icon(
-                painter = painterResource(Res.drawable.person),
+                painter = painterResource(Res.drawable.notification),
                 contentDescription = null,
                 tint = Color.Unspecified,
                 modifier = m
@@ -105,9 +109,41 @@ fun HomeScreen(/*navController: NavController*/) {
 
             ) //notifications
 
+
+        }
+        Column(
+            m.fillMaxSize()
+                .clip(RoundedCornerShape(70.dp, 70.dp, 0.dp, 0.dp))
+                .verticalScroll(scrollState) // <-- This now works on the remaining space
+                .background(Color(217, 217, 217, 255)),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = m.padding(vertical = 24.dp))
+            Box {
+                CarCard(
+                    "Audi",
+                    "A6",
+                    "2026",
+                    "Black",
+                    Res.drawable.audi
+
+                )
+
+            }
+            Spacer(modifier = m.padding(vertical = 24.dp))
+            Row(
+                    horizontalArrangement = Arrangement.Center
+                ) {
+
+                } //card indicator
+                Spacer(modifier = m.padding(vertical = 36.dp))
+            Row()
+            { }
+
         }
     }
 }
+
 
 
 //{
@@ -547,9 +583,9 @@ fun HomeScreen(/*navController: NavController*/) {
 //}
 
 
-
-@Preview
-@Composable
-fun prev() {
-    HomeScreen()
-}
+//
+//@Preview
+//@Composable
+//fun prev() {
+//    HomeScreen()
+//}

@@ -38,8 +38,9 @@ import carware.composeapp.generated.resources.line_1
 import carware.composeapp.generated.resources.poppins_medium
 import carware.composeapp.generated.resources.poppins_semibold
 import com.example.carware.m
+import com.example.carware.navigation.HomeScreen
 import com.example.carware.navigation.LoginScreen
-import com.example.carware.network.apiRequests.ResetPasswordRequest
+import com.example.carware.network.apiRequests.auth.ResetPasswordRequest
 import com.example.carware.screens.appButtonBack
 import com.example.carware.screens.appGradBack
 import com.example.carware.util.SharedToken
@@ -87,7 +88,7 @@ fun NewPasswordScreen(navController: NavController) {
 
 
     )
-    val token = SharedToken.token          // read
+    val token = SharedToken.token   // read
 
     Column(
         modifier = m
@@ -248,6 +249,7 @@ fun NewPasswordScreen(navController: NavController) {
 
                                 )
                             }
+                            navController.navigate(LoginScreen)
 
 
                         },

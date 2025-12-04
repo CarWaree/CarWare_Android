@@ -6,7 +6,7 @@ import com.example.carware.util.UserSession
 class AndroidUserSession(private val context: Context) : UserSession {
     private val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
-    override suspend fun login(token: String) {
+    override suspend fun login(token: String?) {
         prefs.edit().putBoolean("is_logged_in", true).apply()
         prefs.edit().putString("token", token).apply()
     }
